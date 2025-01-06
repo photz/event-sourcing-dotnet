@@ -10,4 +10,10 @@ public class DockerHealthcheckEndpoint : ControllerBase {
     public IActionResult DockerHealthCheck() {
         return Ok("OK");
     }
+    [HttpGet("")]
+    [HttpHead("")]
+    [Produces("text/plain")] 
+    public IActionResult RootDockerHealthCheck() {
+        return Ok("OK");
+    }
 }
