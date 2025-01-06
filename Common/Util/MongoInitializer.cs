@@ -28,12 +28,14 @@ public class MongoInitializer
             _logger.LogInformation("Creating collections");
             CreateCollectionIfNotExists(database, "CookingClub_MembersByCuisine_MembershipApplication");
             CreateCollectionIfNotExists(database, "CookingClub_MembersByCuisine_Cuisine");
+            CreateCollectionIfNotExists(database, "ProjectionIdempotency_ProjectedEvent");
             _logger.LogInformation("Created collections");
 
             _logger.LogInformation("Creating indexes");
-            var enrollmentCollection = database.GetCollection<object>("CookingClub_MembersByCuisine_MembershipApplication");
-            var indexKeysDefinition = Builders<object>.IndexKeys.Ascending("FavoriteCuisine");
-            enrollmentCollection.Indexes.CreateOne(new CreateIndexModel<object>(indexKeysDefinition));
+            var membershipApplicationCollection = database.GetCollection<object>("CookingClub_MembersByCuisine_MembershipApplication");
+            membershipApplicationCollection.Indexes.CreateOne(new CreateIndexModel<object>(Builders<object>.IndexKeys.Ascending("FavoriteCuisine")));
+            var projectedEventCollection = database.GetCollection<object>("ProjectionIdempotency_ProjectedEvent");
+            projectedEventCollection.Indexes.CreateOne(new CreateIndexModel<object>(Builders<object>.IndexKeys.Ascending("eventId").Ascending("projectionName")));
             _logger.LogInformation("Created indexes");
         }
         catch (Exception e)
