@@ -4,7 +4,6 @@ using EventSourcing.Common.Projection;
 using EventSourcing.Common.Query;
 using EventSourcing.Common.Reaction;
 using EventSourcing.Common.SerializedEvent;
-using EventSourcing.Common.SessionAuth;
 using EventSourcing.Common.Util;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Logging.Console;
@@ -75,14 +74,6 @@ AddScopedInheritors<QueryController>(builder.Services);
 AddScopedInheritors<QueryHandler>(builder.Services);
 AddScopedInheritors<ReactionController>(builder.Services);
 AddScopedInheritors<ReactionHandler>(builder.Services);
-builder.Services.AddScoped<SessionRepository>();
-builder.Services.AddScoped<SessionService>(provider =>
-{
-    var sessionRepository = provider.GetRequiredService<SessionRepository>();
-    var sessionExpirationSeconds = int.Parse(GetEnvVar("SESSION_TOKENS_EXPIRE_AFTER_SECONDS"));
-
-    return new SessionService(sessionRepository, sessionExpirationSeconds);
-});
 
 builder.Services.Scan(scan => scan
     .FromAssemblies(AppDomain.CurrentDomain.GetAssemblies())

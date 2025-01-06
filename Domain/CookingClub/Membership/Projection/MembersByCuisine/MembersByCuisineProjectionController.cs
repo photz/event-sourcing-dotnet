@@ -9,6 +9,7 @@ namespace EventSourcing.Domain.CookingClub.Membership.Projection.MembersByCuisin
 [Route("api/v1/cooking-club/membership/projection")]
 [Produces("application/json")]
 [Consumes("application/json")]
+[AmbarAuthMiddleware]
 public class MembersByCuisineProjectionController : ProjectionController
 {
     private readonly MembersByCuisineProjectionHandler _membersByCuisineProjectionHandler;

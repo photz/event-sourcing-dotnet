@@ -11,6 +11,7 @@ namespace EventSourcing.Domain.CookingClub.Membership.Reaction.EvaluateApplicati
 [Route("api/v1/cooking-club/membership/reaction")]
 [Produces("application/json")]
 [Consumes("application/json")]
+[AmbarAuthMiddleware]
 public class EvaluateApplicationReactionController : ReactionController
 {
     private readonly EvaluateApplicationReactionHandler _evaluateApplicationReactionHandler;
