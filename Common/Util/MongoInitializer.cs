@@ -35,7 +35,10 @@ public class MongoInitializer
             var membershipApplicationCollection = database.GetCollection<object>("CookingClub_MembersByCuisine_MembershipApplication");
             membershipApplicationCollection.Indexes.CreateOne(new CreateIndexModel<object>(Builders<object>.IndexKeys.Ascending("FavoriteCuisine")));
             var projectedEventCollection = database.GetCollection<object>("ProjectionIdempotency_ProjectedEvent");
-            projectedEventCollection.Indexes.CreateOne(new CreateIndexModel<object>(Builders<object>.IndexKeys.Ascending("eventId").Ascending("projectionName")));
+            projectedEventCollection.Indexes.CreateOne(new CreateIndexModel<object>(
+                Builders<object>.IndexKeys.Ascending("eventId").Ascending("projectionName"), 
+                new CreateIndexOptions { Unique = true }
+            ));
             _logger.LogInformation("Created indexes");
         }
         catch (Exception e)
