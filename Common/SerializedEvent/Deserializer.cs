@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using EventSourcing.Domain.CookingClub.Membership.Aggregate;
 using EventSourcing.Domain.CookingClub.Membership.Event;
+using EventSourcing.Domain.Geolab.Organization.Event;
 
 namespace EventSourcing.Common.SerializedEvent;
 
@@ -44,6 +45,16 @@ public class Deserializer
                 EvaluationOutcome = MembershipStatusHelper.FromString(
                     PayloadString(serializedEvent.JsonPayload, "evaluationOutcome")
                 ),
+            },
+            "Geolab_Organization_OrganizationAdded" => new OrganizationAdded
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+                Name = PayloadString(serializedEvent.JsonPayload, "name"),
             },
             _ => throw new ArgumentException(
                 $"Unknown event type in Deserializer: {serializedEvent.EventName}"
