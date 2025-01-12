@@ -1,6 +1,6 @@
 using EventSourcing.Common.Projection;
-using EventSourcing.Domain.CookingClub.Membership.Event;
 using EventSourcing.Domain.CookingClub.Membership.Aggregate;
+using EventSourcing.Domain.CookingClub.Membership.Event;
 
 namespace EventSourcing.Domain.CookingClub.Membership.Projection.MembersByCuisine;
 
@@ -11,7 +11,8 @@ public class MembersByCuisineProjectionHandler : ProjectionHandler
 
     public MembersByCuisineProjectionHandler(
         CuisineRepository cuisineRepository,
-        MembershipApplicationRepository membershipApplicationRepository)
+        MembershipApplicationRepository membershipApplicationRepository
+    )
     {
         _cuisineRepository = cuisineRepository;
         _membershipApplicationRepository = membershipApplicationRepository;
@@ -22,26 +23,36 @@ public class MembersByCuisineProjectionHandler : ProjectionHandler
         switch (@event)
         {
             case ApplicationSubmitted applicationSubmitted:
-                _membershipApplicationRepository.Save(new MembershipApplication
-                {
-                    Id = applicationSubmitted.AggregateId,
-                    FirstName = applicationSubmitted.FirstName,
-                    LastName = applicationSubmitted.LastName,
-                    FavoriteCuisine = applicationSubmitted.FavoriteCuisine
-                });
+                _membershipApplicationRepository.Save(
+                    new MembershipApplication
+                    {
+                        Id = applicationSubmitted.AggregateId,
+                        FirstName = applicationSubmitted.FirstName,
+                        LastName = applicationSubmitted.LastName,
+                        FavoriteCuisine = applicationSubmitted.FavoriteCuisine,
+                    }
+                );
                 break;
 
-            case ApplicationEvaluated { EvaluationOutcome: MembershipStatus.Approved } applicationEvaluated:
-                var membershipApplication = _membershipApplicationRepository.FindOneById(applicationEvaluated.AggregateId)
+            case ApplicationEvaluated
+            {
+                EvaluationOutcome: MembershipStatus.Approved
+            } applicationEvaluated:
+                var membershipApplication =
+                    _membershipApplicationRepository.FindOneById(applicationEvaluated.AggregateId)
                     ?? throw new InvalidOperationException("Membership application not found");
 
-                var cuisine = _cuisineRepository.FindOneById(membershipApplication.FavoriteCuisine) ?? new Cuisine
-                {
-                    Id = membershipApplication.FavoriteCuisine,
-                    MemberNames = new List<string>()
-                };
+                var cuisine =
+                    _cuisineRepository.FindOneById(membershipApplication.FavoriteCuisine)
+                    ?? new Cuisine
+                    {
+                        Id = membershipApplication.FavoriteCuisine,
+                        MemberNames = new List<string>(),
+                    };
 
-                cuisine.MemberNames.Add($"{membershipApplication.FirstName} {membershipApplication.LastName}");
+                cuisine.MemberNames.Add(
+                    $"{membershipApplication.FirstName} {membershipApplication.LastName}"
+                );
                 _cuisineRepository.Save(cuisine);
                 break;
         }

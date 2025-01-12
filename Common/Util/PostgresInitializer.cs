@@ -19,7 +19,8 @@ public class PostgresInitializer
         string replicationUsername,
         string replicationPassword,
         string replicationPublication,
-        ILogger<PostgresInitializer> logger)
+        ILogger<PostgresInitializer> logger
+    )
     {
         _connectionPool = connectionPool;
         _databaseName = databaseName;
@@ -37,7 +38,9 @@ public class PostgresInitializer
         {
             // Create table
             _logger.LogInformation("Creating table {TableName}", _tableName);
-            ExecuteStatementIgnoreErrors(connection, $"""
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"""
                 CREATE TABLE IF NOT EXISTS {_tableName} (
                     id BIGSERIAL NOT NULL,
                     event_id TEXT NOT NULL UNIQUE,
@@ -50,51 +53,72 @@ public class PostgresInitializer
                     json_payload TEXT NOT NULL,
                     json_metadata TEXT NOT NULL,
                     PRIMARY KEY (id));
-                """);
+                """
+            );
 
             // Create replication user
             _logger.LogInformation("Creating replication user");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE USER {_replicationUsername} REPLICATION LOGIN PASSWORD '{_replicationPassword}';");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE USER {_replicationUsername} REPLICATION LOGIN PASSWORD '{_replicationPassword}';"
+            );
 
             // Grant permissions to user
             _logger.LogInformation("Granting permissions to replication user");
-            ExecuteStatementIgnoreErrors(connection,
-                $"""GRANT CONNECT ON DATABASE "{_databaseName}" TO {_replicationUsername};""");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"""GRANT CONNECT ON DATABASE "{_databaseName}" TO {_replicationUsername};"""
+            );
 
             _logger.LogInformation("Granting select to replication user");
-            ExecuteStatementIgnoreErrors(connection,
-                $"GRANT SELECT ON TABLE {_tableName} TO {_replicationUsername};");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"GRANT SELECT ON TABLE {_tableName} TO {_replicationUsername};"
+            );
 
             // Create publication
             _logger.LogInformation("Creating publication for table");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE PUBLICATION {_replicationPublication} FOR TABLE {_tableName};");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE PUBLICATION {_replicationPublication} FOR TABLE {_tableName};"
+            );
 
             // Create indexes
             _logger.LogInformation("Creating aggregate id, aggregate version index");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE UNIQUE INDEX event_store_idx_event_aggregate_id_version ON {_tableName}(aggregate_id, aggregate_version);");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE UNIQUE INDEX event_store_idx_event_aggregate_id_version ON {_tableName}(aggregate_id, aggregate_version);"
+            );
 
             _logger.LogInformation("Creating id index");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE UNIQUE INDEX event_store_idx_event_id ON {_tableName}(event_id);");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE UNIQUE INDEX event_store_idx_event_id ON {_tableName}(event_id);"
+            );
 
             _logger.LogInformation("Creating causation index");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE INDEX event_store_idx_event_causation_id ON {_tableName}(causation_id);");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE INDEX event_store_idx_event_causation_id ON {_tableName}(causation_id);"
+            );
 
             _logger.LogInformation("Creating correlation index");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE INDEX event_store_idx_event_correlation_id ON {_tableName}(correlation_id);");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE INDEX event_store_idx_event_correlation_id ON {_tableName}(correlation_id);"
+            );
 
             _logger.LogInformation("Creating recording index");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE INDEX event_store_idx_occurred_on ON {_tableName}(recorded_on);");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE INDEX event_store_idx_occurred_on ON {_tableName}(recorded_on);"
+            );
 
             _logger.LogInformation("Creating event name index");
-            ExecuteStatementIgnoreErrors(connection,
-                $"CREATE INDEX event_store_idx_event_name ON {_tableName}(event_name);");
+            ExecuteStatementIgnoreErrors(
+                connection,
+                $"CREATE INDEX event_store_idx_event_name ON {_tableName}(event_name);"
+            );
         }
         finally
         {

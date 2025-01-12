@@ -2,10 +2,12 @@ using MongoDB.Driver;
 
 namespace EventSourcing.Common.Util;
 
-public class MongoSessionPool {
+public class MongoSessionPool
+{
     private readonly IMongoClient _transactionalClient;
 
-    public MongoSessionPool(string connectionString) {
+    public MongoSessionPool(string connectionString)
+    {
         var settings = MongoClientSettings.FromConnectionString(connectionString);
         settings.ServerApi = new ServerApi(ServerApiVersion.V1);
 
@@ -20,7 +22,8 @@ public class MongoSessionPool {
         _transactionalClient = new MongoClient(transactionalSettings);
     }
 
-    public IClientSessionHandle StartSession() {
+    public IClientSessionHandle StartSession()
+    {
         return _transactionalClient.StartSession();
     }
 }

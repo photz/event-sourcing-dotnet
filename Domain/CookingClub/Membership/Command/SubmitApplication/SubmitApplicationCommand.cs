@@ -1,6 +1,6 @@
 namespace EventSourcing.Domain.CookingClub.Membership.Command.SubmitApplication;
 
-public class SubmitApplicationCommand: Common.Command.Command
+public class SubmitApplicationCommand : Common.Command.Command
 {
     public required string FirstName { get; init; }
     public required string LastName { get; init; }

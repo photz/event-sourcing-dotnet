@@ -11,7 +11,8 @@ public class MongoInitializer
     public MongoInitializer(
         MongoSessionPool sessionPool,
         string databaseName,
-        ILogger<MongoInitializer> logger)
+        ILogger<MongoInitializer> logger
+    )
     {
         _sessionPool = sessionPool;
         _databaseName = databaseName;
@@ -26,19 +27,32 @@ public class MongoInitializer
         try
         {
             _logger.LogInformation("Creating collections");
-            CreateCollectionIfNotExists(database, "CookingClub_MembersByCuisine_MembershipApplication");
+            CreateCollectionIfNotExists(
+                database,
+                "CookingClub_MembersByCuisine_MembershipApplication"
+            );
             CreateCollectionIfNotExists(database, "CookingClub_MembersByCuisine_Cuisine");
             CreateCollectionIfNotExists(database, "ProjectionIdempotency_ProjectedEvent");
             _logger.LogInformation("Created collections");
 
             _logger.LogInformation("Creating indexes");
-            var membershipApplicationCollection = database.GetCollection<object>("CookingClub_MembersByCuisine_MembershipApplication");
-            membershipApplicationCollection.Indexes.CreateOne(new CreateIndexModel<object>(Builders<object>.IndexKeys.Ascending("FavoriteCuisine")));
-            var projectedEventCollection = database.GetCollection<object>("ProjectionIdempotency_ProjectedEvent");
-            projectedEventCollection.Indexes.CreateOne(new CreateIndexModel<object>(
-                Builders<object>.IndexKeys.Ascending("eventId").Ascending("projectionName"), 
-                new CreateIndexOptions { Unique = true }
-            ));
+            var membershipApplicationCollection = database.GetCollection<object>(
+                "CookingClub_MembersByCuisine_MembershipApplication"
+            );
+            membershipApplicationCollection.Indexes.CreateOne(
+                new CreateIndexModel<object>(
+                    Builders<object>.IndexKeys.Ascending("FavoriteCuisine")
+                )
+            );
+            var projectedEventCollection = database.GetCollection<object>(
+                "ProjectionIdempotency_ProjectedEvent"
+            );
+            projectedEventCollection.Indexes.CreateOne(
+                new CreateIndexModel<object>(
+                    Builders<object>.IndexKeys.Ascending("eventId").Ascending("projectionName"),
+                    new CreateIndexOptions { Unique = true }
+                )
+            );
             _logger.LogInformation("Created indexes");
         }
         catch (Exception e)
@@ -60,7 +74,10 @@ public class MongoInitializer
             }
             else
             {
-                _logger.LogInformation("Collection {CollectionName} already exists", collectionName);
+                _logger.LogInformation(
+                    "Collection {CollectionName} already exists",
+                    collectionName
+                );
             }
         }
         catch (Exception e)

@@ -9,14 +9,17 @@ public class SubmitApplicationCommandHandler : CommandHandler
 {
     public SubmitApplicationCommandHandler(
         PostgresTransactionalEventStore postgresTransactionalEventStore
-        ) : base(postgresTransactionalEventStore) {
-    }
+    )
+        : base(postgresTransactionalEventStore) { }
 
     public override void HandleCommand(Common.Command.Command command)
     {
-        if (command is SubmitApplicationCommand submitApplicationCommand) {
+        if (command is SubmitApplicationCommand submitApplicationCommand)
+        {
             HandleSubmitApplication(submitApplicationCommand);
-        } else {
+        }
+        else
+        {
             throw new ArgumentException($"Unsupported command type: {command.GetType().Name}");
         }
     }
@@ -26,7 +29,8 @@ public class SubmitApplicationCommandHandler : CommandHandler
         var eventId = IdGenerator.GenerateRandomId();
         var aggregateId = IdGenerator.GenerateRandomId();
 
-        var applicationSubmitted = new ApplicationSubmitted() {
+        var applicationSubmitted = new ApplicationSubmitted()
+        {
             EventId = eventId,
             AggregateId = aggregateId,
             AggregateVersion = 1,
@@ -37,7 +41,7 @@ public class SubmitApplicationCommandHandler : CommandHandler
             LastName = command.LastName,
             FavoriteCuisine = command.FavoriteCuisine,
             YearsOfProfessionalExperience = command.YearsOfProfessionalExperience,
-            NumberOfCookingBooksRead = command.NumberOfCookingBooksRead
+            NumberOfCookingBooksRead = command.NumberOfCookingBooksRead,
         };
 
         _postgresTransactionalEventStore.SaveEvent(applicationSubmitted);

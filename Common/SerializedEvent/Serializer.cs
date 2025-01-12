@@ -17,7 +17,7 @@ public class Serializer
             RecordedOn = FormatDateTime(@event.RecordedOn),
             EventName = DetermineEventName(@event),
             JsonPayload = CreateJsonPayload(@event),
-            JsonMetadata = "{}"
+            JsonMetadata = "{}",
         };
     }
 
@@ -27,7 +27,9 @@ public class Serializer
         {
             ApplicationSubmitted => "CookingClub_Membership_ApplicationSubmitted",
             ApplicationEvaluated => "CookingClub_Membership_ApplicationEvaluated",
-            _ => throw new ArgumentException($"Unknown event type: {@event.GetType().Name}")
+            _ => throw new ArgumentException(
+                $"Unknown event type in Serializer: {@event.GetType().Name}"
+            ),
         };
     }
 
@@ -41,12 +43,22 @@ public class Serializer
                 jsonObject.Add("firstName", applicationSubmitted.FirstName);
                 jsonObject.Add("lastName", applicationSubmitted.LastName);
                 jsonObject.Add("favoriteCuisine", applicationSubmitted.FavoriteCuisine);
-                jsonObject.Add("yearsOfProfessionalExperience", applicationSubmitted.YearsOfProfessionalExperience);
-                jsonObject.Add("numberOfCookingBooksRead", applicationSubmitted.NumberOfCookingBooksRead);
+                jsonObject.Add(
+                    "yearsOfProfessionalExperience",
+                    applicationSubmitted.YearsOfProfessionalExperience
+                );
+                jsonObject.Add(
+                    "numberOfCookingBooksRead",
+                    applicationSubmitted.NumberOfCookingBooksRead
+                );
                 break;
 
             case ApplicationEvaluated applicationEvaluated:
-                jsonObject.Add("evaluationOutcome", applicationEvaluated.EvaluationOutcome.ToString());
+                jsonObject.Add(
+                    "evaluationOutcome",
+                    applicationEvaluated.EvaluationOutcome.ToString()
+                );
+                break;
                 break;
         }
 

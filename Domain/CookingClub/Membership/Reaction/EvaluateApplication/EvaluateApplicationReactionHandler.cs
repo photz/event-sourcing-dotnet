@@ -9,9 +9,7 @@ namespace EventSourcing.Domain.CookingClub.Membership.Reaction.EvaluateApplicati
 public class EvaluateApplicationReactionHandler : ReactionHandler
 {
     public EvaluateApplicationReactionHandler(PostgresTransactionalEventStore eventStore)
-        : base(eventStore)
-    {
-    }
+        : base(eventStore) { }
 
     public override void React(Common.Event.Event @event)
     {
@@ -20,7 +18,10 @@ public class EvaluateApplicationReactionHandler : ReactionHandler
             return;
         }
 
-        var aggregateAndEventIds = _postgresTransactionalEventStore.FindAggregate<Aggregate.Membership>(applicationSubmitted.AggregateId);
+        var aggregateAndEventIds =
+            _postgresTransactionalEventStore.FindAggregate<Aggregate.Membership>(
+                applicationSubmitted.AggregateId
+            );
         var membership = aggregateAndEventIds.Aggregate;
         var causationId = aggregateAndEventIds.EventIdOfLastEvent;
         var correlationId = aggregateAndEventIds.CorrelationIdOfLastEvent;
@@ -30,13 +31,17 @@ public class EvaluateApplicationReactionHandler : ReactionHandler
             return;
         }
 
-        var reactionEventId = GenerateDeterministicId($"CookingClub_Membership_ReviewedApplication:{applicationSubmitted.EventId}");
+        var reactionEventId = GenerateDeterministicId(
+            $"CookingClub_Membership_ReviewedApplication:{applicationSubmitted.EventId}"
+        );
         if (_postgresTransactionalEventStore.DoesEventAlreadyExist(reactionEventId))
         {
             return;
         }
 
-        var shouldApprove = applicationSubmitted is { YearsOfProfessionalExperience: 0, NumberOfCookingBooksRead: > 0 };
+        var shouldApprove =
+            applicationSubmitted
+                is { YearsOfProfessionalExperience: 0, NumberOfCookingBooksRead: > 0 };
 
         var reactionEvent = new ApplicationEvaluated
         {
@@ -46,7 +51,9 @@ public class EvaluateApplicationReactionHandler : ReactionHandler
             CausationId = causationId,
             CorrelationId = correlationId,
             RecordedOn = DateTime.UtcNow,
-            EvaluationOutcome = shouldApprove ? MembershipStatus.Approved : MembershipStatus.Rejected
+            EvaluationOutcome = shouldApprove
+                ? MembershipStatus.Approved
+                : MembershipStatus.Rejected,
         };
 
         _postgresTransactionalEventStore.SaveEvent(reactionEvent);

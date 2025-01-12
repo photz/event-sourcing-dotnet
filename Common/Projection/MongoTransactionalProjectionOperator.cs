@@ -4,7 +4,8 @@ using MongoDB.Driver;
 
 namespace EventSourcing.Common.Projection;
 
-public class MongoTransactionalProjectionOperator {
+public class MongoTransactionalProjectionOperator
+{
     private readonly MongoSessionPool _sessionPool;
     private readonly string _databaseName;
     private readonly ILogger<MongoTransactionalProjectionOperator> _logger;
@@ -13,9 +14,10 @@ public class MongoTransactionalProjectionOperator {
 
     public MongoTransactionalProjectionOperator(
         MongoSessionPool sessionPool,
-        string databaseName, 
+        string databaseName,
         ILogger<MongoTransactionalProjectionOperator> logger
-    ) {
+    )
+    {
         _sessionPool = sessionPool;
         _databaseName = databaseName;
         _logger = logger;
@@ -23,16 +25,20 @@ public class MongoTransactionalProjectionOperator {
         _database = null;
     }
 
-    public void StartTransaction() {
-        if (_session != null) {
+    public void StartTransaction()
+    {
+        if (_session != null)
+        {
             throw new Exception("Session to MongoDB already active!");
         }
-        
-        if (_database != null) {
+
+        if (_database != null)
+        {
             throw new Exception("Database already initialized in the current session.");
         }
 
-        try {
+        try
+        {
             _session = _sessionPool.StartSession();
 
             var transactionOptions = new TransactionOptions(
@@ -43,93 +49,131 @@ public class MongoTransactionalProjectionOperator {
 
             _session.StartTransaction(transactionOptions);
             _database = _session.Client.GetDatabase(_databaseName);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new Exception("Failed to start MongoDB transaction", ex);
         }
     }
 
-    public void CommitTransaction() {
-        if (_session == null) {
+    public void CommitTransaction()
+    {
+        if (_session == null)
+        {
             throw new Exception("Session must be active to commit transaction to MongoDB!");
         }
-        
-        if (!_session.IsInTransaction) {
+
+        if (!_session.IsInTransaction)
+        {
             throw new Exception("Transaction must be active to commit transaction to MongoDB!");
         }
 
-        try {
+        try
+        {
             _session.CommitTransaction();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new Exception("Failed to commit MongoDB transaction", ex);
         }
     }
 
-    public void AbortDanglingTransactionsAndReturnSessionToPool() {
-        if (_session == null) {
+    public void AbortDanglingTransactionsAndReturnSessionToPool()
+    {
+        if (_session == null)
+        {
             _database = null;
             return;
         }
 
-        try {
-            if (_session.IsInTransaction) {
+        try
+        {
+            if (_session.IsInTransaction)
+            {
                 _session.AbortTransaction();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             _logger.LogError(ex, "Failed to abort Mongo transaction");
         }
 
-        try {
+        try
+        {
             _session.Dispose();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             _logger.LogError(ex, "Failed to release Mongo session");
         }
 
         _session = null;
         _database = null;
     }
-    
-    public IReadOnlyList<TDocument> Find<TDocument>(string collectionName, Expression<Func<TDocument, bool>> filter, FindOptions? options = null)
+
+    public IReadOnlyList<TDocument> Find<TDocument>(
+        string collectionName,
+        Expression<Func<TDocument, bool>> filter,
+        FindOptions? options = null
+    )
     {
         var (session, database) = Operate();
         var collection = database.GetCollection<TDocument>(collectionName);
-        
+
         return collection.Find(session, filter, options).ToList();
-    } 
-    
-    public ReplaceOneResult ReplaceOne<TDocument>(string collectionName, Expression<Func<TDocument, bool>> filter, TDocument replacement, ReplaceOptions? options = null)
+    }
+
+    public ReplaceOneResult ReplaceOne<TDocument>(
+        string collectionName,
+        Expression<Func<TDocument, bool>> filter,
+        TDocument replacement,
+        ReplaceOptions? options = null
+    )
     {
         var (session, database) = Operate();
         var collection = database.GetCollection<TDocument>(collectionName);
-        
+
         return collection.ReplaceOne(session, filter, replacement, options);
     }
-    
-    public void InsertOne<TDocument>(string collectionName, TDocument document, InsertOneOptions? options = null)
+
+    public void InsertOne<TDocument>(
+        string collectionName,
+        TDocument document,
+        InsertOneOptions? options = null
+    )
     {
         var (session, database) = Operate();
         var collection = database.GetCollection<TDocument>(collectionName);
-        
+
         collection.InsertOne(session, document, options);
     }
-    
-    public long CountDocuments<TDocument>(string collectionName, Expression<Func<TDocument, bool>> filter, CountOptions? options = null)
+
+    public long CountDocuments<TDocument>(
+        string collectionName,
+        Expression<Func<TDocument, bool>> filter,
+        CountOptions? options = null
+    )
     {
         var (session, database) = Operate();
         var collection = database.GetCollection<TDocument>(collectionName);
-        
+
         return collection.CountDocuments(session, filter, options);
     }
 
-    private (IClientSessionHandle, IMongoDatabase) Operate() {
-        if (_session == null) {
+    private (IClientSessionHandle, IMongoDatabase) Operate()
+    {
+        if (_session == null)
+        {
             throw new Exception("Session must be active to read or write to MongoDB!");
         }
-        
-        if (!_session.IsInTransaction) {
+
+        if (!_session.IsInTransaction)
+        {
             throw new Exception("Transaction must be active to read or write to MongoDB!");
         }
 
-        if (_database == null) {
+        if (_database == null)
+        {
             throw new Exception("Database must be initialized in the current session.");
         }
 

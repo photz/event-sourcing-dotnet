@@ -13,22 +13,28 @@ public class AmbarAuthMiddlewareAttribute : ActionFilterAttribute
 
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            throw new ArgumentNullException(nameof(username), 
-                "Environment variables AMBAR_HTTP_USERNAME and AMBAR_HTTP_PASSWORD must be set");
+            throw new ArgumentNullException(
+                nameof(username),
+                "Environment variables AMBAR_HTTP_USERNAME and AMBAR_HTTP_PASSWORD must be set"
+            );
         }
 
         if (!context.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
         {
-            context.Result = new JsonResult(new { error = "Authentication required" }) 
-                { StatusCode = 401 };
+            context.Result = new JsonResult(new { error = "Authentication required" })
+            {
+                StatusCode = 401,
+            };
             return;
         }
 
         var header = authHeader.ToString();
         if (!header.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
         {
-            context.Result = new JsonResult(new { error = "Basic authentication required" }) 
-                { StatusCode = 401 };
+            context.Result = new JsonResult(new { error = "Basic authentication required" })
+            {
+                StatusCode = 401,
+            };
             return;
         }
 
@@ -45,15 +51,19 @@ public class AmbarAuthMiddlewareAttribute : ActionFilterAttribute
 
             if (parts[0] != username || parts[1] != password)
             {
-                context.Result = new JsonResult(new { error = "Invalid credentials" }) 
-                    { StatusCode = 401 };
+                context.Result = new JsonResult(new { error = "Invalid credentials" })
+                {
+                    StatusCode = 401,
+                };
                 return;
             }
         }
         catch (Exception)
         {
-            context.Result = new JsonResult(new { error = "Invalid authentication format" }) 
-                { StatusCode = 401 };
+            context.Result = new JsonResult(new { error = "Invalid authentication format" })
+            {
+                StatusCode = 401,
+            };
             return;
         }
 

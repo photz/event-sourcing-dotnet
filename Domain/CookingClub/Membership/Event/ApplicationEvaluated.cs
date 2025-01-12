@@ -3,7 +3,7 @@ using EventSourcing.Domain.CookingClub.Membership.Aggregate;
 
 namespace EventSourcing.Domain.CookingClub.Membership.Event;
 
-public class ApplicationEvaluated: TransformationEvent<Aggregate.Membership>
+public class ApplicationEvaluated : TransformationEvent<Aggregate.Membership>
 {
     public required MembershipStatus EvaluationOutcome { get; init; }
 
@@ -15,7 +15,7 @@ public class ApplicationEvaluated: TransformationEvent<Aggregate.Membership>
             AggregateVersion = AggregateVersion,
             FirstName = aggregate.FirstName,
             LastName = aggregate.LastName,
-            Status = EvaluationOutcome
+            Status = EvaluationOutcome,
         };
     }
 }

@@ -25,9 +25,8 @@ public class MembershipApplicationRepository
 
     public MembershipApplication? FindOneById(string id)
     {
-        return _mongoOperator.Find<MembershipApplication>(
-            _collectionName,
-            m => m.Id == id
-        ).FirstOrDefault();
+        return _mongoOperator
+            .Find<MembershipApplication>(_collectionName, m => m.Id == id)
+            .FirstOrDefault();
     }
 }

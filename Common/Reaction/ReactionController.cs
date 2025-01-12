@@ -5,7 +5,8 @@ using EventSourcing.Common.SerializedEvent;
 
 namespace EventSourcing.Common.Reaction;
 
-public abstract class ReactionController {
+public abstract class ReactionController
+{
     private readonly PostgresTransactionalEventStore _postgresTransactionalEventStore;
     private readonly MongoTransactionalProjectionOperator _mongoTransactionalProjectionOperator;
     private readonly Deserializer _deserializer;
@@ -16,17 +17,23 @@ public abstract class ReactionController {
         MongoTransactionalProjectionOperator mongoTransactionalProjectionOperator,
         Deserializer deserializer,
         ILogger<ReactionController> logger
-    ) {
+    )
+    {
         _postgresTransactionalEventStore = postgresTransactionalEventStore;
         _mongoTransactionalProjectionOperator = mongoTransactionalProjectionOperator;
         _deserializer = deserializer;
         _logger = logger;
     }
 
-    protected string ProcessReactionHttpRequest(AmbarHttpRequest ambarHttpRequest, ReactionHandler reactionHandler) {
-        try {
+    protected string ProcessReactionHttpRequest(
+        AmbarHttpRequest ambarHttpRequest,
+        ReactionHandler reactionHandler
+    )
+    {
+        try
+        {
             _logger.LogDebug(
-                "Starting to process reaction for event name: {EventName} using handler: {HandlerName}", 
+                "Starting to process reaction for event name: {EventName} using handler: {HandlerName}",
                 ambarHttpRequest.SerializedEvent.EventName,
                 reactionHandler.GetType().Name
             );
@@ -40,24 +47,32 @@ public abstract class ReactionController {
             _mongoTransactionalProjectionOperator.AbortDanglingTransactionsAndReturnSessionToPool();
 
             _logger.LogDebug(
-                "Reaction successfully processed for event name: {EventName} using handler: {HandlerName}", 
+                "Reaction successfully processed for event name: {EventName} using handler: {HandlerName}",
                 ambarHttpRequest.SerializedEvent.EventName,
                 reactionHandler.GetType().Name
             );
             return AmbarResponseFactory.SuccessResponse();
-        } catch (Exception ex) when (ex.Message?.StartsWith("Unknown event type") == true) {
+        }
+        catch (Exception ex) when (ex.Message?.StartsWith("Unknown event type") == true)
+        {
             _postgresTransactionalEventStore.AbortDanglingTransactionsAndReturnConnectionToPool();
             _mongoTransactionalProjectionOperator.AbortDanglingTransactionsAndReturnSessionToPool();
             _logger.LogDebug(
-                "Unknown event in reaction ignored for event name: {EventName} using handler: {HandlerName}", 
+                "Unknown event in reaction ignored for event name: {EventName} using handler: {HandlerName}",
                 ambarHttpRequest.SerializedEvent.EventName,
                 reactionHandler.GetType().Name
             );
             return AmbarResponseFactory.SuccessResponse();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             _postgresTransactionalEventStore.AbortDanglingTransactionsAndReturnConnectionToPool();
             _mongoTransactionalProjectionOperator.AbortDanglingTransactionsAndReturnSessionToPool();
-            _logger.LogError("Exception in ProcessReactionHttpRequest: {0}, {1}", ex.Message, ex.StackTrace);
+            _logger.LogError(
+                "Exception in ProcessReactionHttpRequest: {0}, {1}",
+                ex.Message,
+                ex.StackTrace
+            );
             return AmbarResponseFactory.RetryResponse(ex);
         }
     }

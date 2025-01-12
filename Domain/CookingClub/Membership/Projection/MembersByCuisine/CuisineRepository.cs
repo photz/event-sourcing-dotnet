@@ -25,17 +25,11 @@ public class CuisineRepository
 
     public Cuisine? FindOneById(string id)
     {
-        return _mongoOperator.Find<Cuisine>(
-            _collectionName,
-            c => c.Id == id
-        ).FirstOrDefault();
+        return _mongoOperator.Find<Cuisine>(_collectionName, c => c.Id == id).FirstOrDefault();
     }
 
     public IReadOnlyList<Cuisine> FindAll()
     {
-        return _mongoOperator.Find<Cuisine>(
-            _collectionName,
-            _ => true
-        );
+        return _mongoOperator.Find<Cuisine>(_collectionName, _ => true);
     }
 }

@@ -18,7 +18,8 @@ public class MembersByCuisineProjectionController : ProjectionController
         MongoTransactionalProjectionOperator mongoOperator,
         Deserializer deserializer,
         ILogger<MembersByCuisineProjectionController> logger,
-        MembersByCuisineProjectionHandler membersByCuisineProjectionHandler)
+        MembersByCuisineProjectionHandler membersByCuisineProjectionHandler
+    )
         : base(mongoOperator, deserializer, logger)
     {
         _membersByCuisineProjectionHandler = membersByCuisineProjectionHandler;
@@ -32,9 +33,10 @@ public class MembersByCuisineProjectionController : ProjectionController
             Content = ProcessProjectionHttpRequest(
                 request,
                 _membersByCuisineProjectionHandler,
-                "CookingClub_Membership_MembersByCuisine"),
+                "CookingClub_Membership_MembersByCuisine"
+            ),
             ContentType = "application/json",
-            StatusCode = 200
+            StatusCode = 200,
         };
     }
 }

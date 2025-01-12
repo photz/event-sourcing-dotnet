@@ -24,8 +24,14 @@ public class Deserializer
                 FirstName = PayloadString(serializedEvent.JsonPayload, "firstName"),
                 LastName = PayloadString(serializedEvent.JsonPayload, "lastName"),
                 FavoriteCuisine = PayloadString(serializedEvent.JsonPayload, "favoriteCuisine"),
-                YearsOfProfessionalExperience = PayloadInt(serializedEvent.JsonPayload, "yearsOfProfessionalExperience"),
-                NumberOfCookingBooksRead = PayloadInt(serializedEvent.JsonPayload, "numberOfCookingBooksRead")
+                YearsOfProfessionalExperience = PayloadInt(
+                    serializedEvent.JsonPayload,
+                    "yearsOfProfessionalExperience"
+                ),
+                NumberOfCookingBooksRead = PayloadInt(
+                    serializedEvent.JsonPayload,
+                    "numberOfCookingBooksRead"
+                ),
             },
             "CookingClub_Membership_ApplicationEvaluated" => new ApplicationEvaluated
             {
@@ -35,9 +41,13 @@ public class Deserializer
                 CorrelationId = serializedEvent.CorrelationId,
                 CausationId = serializedEvent.CausationId,
                 RecordedOn = recordedOn,
-                EvaluationOutcome = MembershipStatusHelper.FromString(PayloadString(serializedEvent.JsonPayload, "evaluationOutcome"))
+                EvaluationOutcome = MembershipStatusHelper.FromString(
+                    PayloadString(serializedEvent.JsonPayload, "evaluationOutcome")
+                ),
             },
-            _ => throw new ArgumentException($"Unknown event type: {serializedEvent.EventName}")
+            _ => throw new ArgumentException(
+                $"Unknown event type in Deserializer: {serializedEvent.EventName}"
+            ),
         };
     }
 
@@ -47,12 +57,16 @@ public class Deserializer
         {
             throw new ArgumentException($"Invalid date format: {recordedOn}");
         }
-        
-        if (DateTime.TryParseExact(recordedOn[..^4], 
+
+        if (
+            DateTime.TryParseExact(
+                recordedOn[..^4],
                 "yyyy-MM-dd HH:mm:ss.ffffff",
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.AssumeUniversal,
-                out var result))
+                out var result
+            )
+        )
         {
             return DateTime.SpecifyKind(result, DateTimeKind.Utc);
         }
@@ -68,7 +82,7 @@ public class Deserializer
             throw new ArgumentException($"Required field {fieldName} is null or missing");
         return value;
     }
-    
+
     private static int PayloadInt(string jsonString, string fieldName)
     {
         var jsonNode = JsonNode.Parse(jsonString);

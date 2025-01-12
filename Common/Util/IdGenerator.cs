@@ -3,12 +3,16 @@ using System.Text;
 
 namespace EventSourcing.Common.Util;
 
-public static class IdGenerator {
-    private const string AlphanumericCharacters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+public static class IdGenerator
+{
+    private const string AlphanumericCharacters =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private const int IdLength = 56;
 
-    public static string GenerateDeterministicId(string seed) {
-        if (string.IsNullOrEmpty(seed)) {
+    public static string GenerateDeterministicId(string seed)
+    {
+        if (string.IsNullOrEmpty(seed))
+        {
             throw new ArgumentException("Input string cannot be null or empty");
         }
 
@@ -26,11 +30,13 @@ public static class IdGenerator {
         return cleanId[..IdLength];
     }
 
-    public static string GenerateRandomId() {
+    public static string GenerateRandomId()
+    {
         using var rng = RandomNumberGenerator.Create();
         var chars = new char[IdLength];
 
-        for (var i = 0; i < IdLength; i++) {
+        for (var i = 0; i < IdLength; i++)
+        {
             var randomByte = new byte[1];
             rng.GetBytes(randomByte);
             chars[i] = AlphanumericCharacters[randomByte[0] % AlphanumericCharacters.Length];

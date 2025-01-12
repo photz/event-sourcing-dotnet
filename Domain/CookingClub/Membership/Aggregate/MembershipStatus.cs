@@ -4,7 +4,7 @@ public enum MembershipStatus
 {
     Requested,
     Approved,
-    Rejected
+    Rejected,
 }
 
 public static class MembershipStatusHelper

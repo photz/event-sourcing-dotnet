@@ -2,10 +2,12 @@ using EventSourcing.Common.EventStore;
 
 namespace EventSourcing.Common.Command;
 
-public abstract class CommandHandler {
+public abstract class CommandHandler
+{
     protected readonly PostgresTransactionalEventStore _postgresTransactionalEventStore;
 
-    protected CommandHandler(PostgresTransactionalEventStore postgresTransactionalEventStore) {
+    protected CommandHandler(PostgresTransactionalEventStore postgresTransactionalEventStore)
+    {
         _postgresTransactionalEventStore = postgresTransactionalEventStore;
     }
 

@@ -1,5 +1,5 @@
-using EventSourcing.Common.Query;
 using EventSourcing.Common.Projection;
+using EventSourcing.Common.Query;
 using EventSourcing.Domain.CookingClub.Membership.Projection.MembersByCuisine;
 
 namespace EventSourcing.Domain.CookingClub.Membership.Query.MembersByCuisine;
@@ -10,7 +10,8 @@ public class MembersByCuisineQueryHandler : QueryHandler
 
     public MembersByCuisineQueryHandler(
         MongoTransactionalProjectionOperator mongoTransactionalProjectionOperator,
-        CuisineRepository cuisineRepository)
+        CuisineRepository cuisineRepository
+    )
         : base(mongoTransactionalProjectionOperator)
     {
         _cuisineRepository = cuisineRepository;

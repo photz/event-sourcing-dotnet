@@ -17,7 +17,8 @@ public class SubmitApplicationCommandController : CommandController
         PostgresTransactionalEventStore postgresTransactionalEventStore,
         MongoTransactionalProjectionOperator mongoTransactionalProjectionOperator,
         ILogger<SubmitApplicationCommandController> logger,
-        SubmitApplicationCommandHandler submitApplicationCommandHandler)
+        SubmitApplicationCommandHandler submitApplicationCommandHandler
+    )
         : base(postgresTransactionalEventStore, mongoTransactionalProjectionOperator, logger)
     {
         _submitApplicationCommandHandler = submitApplicationCommandHandler;
@@ -25,17 +26,15 @@ public class SubmitApplicationCommandController : CommandController
 
     [HttpPost("submit-application")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-    public IActionResult SubmitApplication(
-        [FromBody] SubmitApplicationHttpRequest request
-    ) {
-
+    public IActionResult SubmitApplication([FromBody] SubmitApplicationHttpRequest request)
+    {
         var command = new SubmitApplicationCommand
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
             FavoriteCuisine = request.FavoriteCuisine,
             YearsOfProfessionalExperience = request.YearsOfProfessionalExperience,
-            NumberOfCookingBooksRead = request.NumberOfCookingBooksRead
+            NumberOfCookingBooksRead = request.NumberOfCookingBooksRead,
         };
 
         ProcessCommand(command, _submitApplicationCommandHandler);

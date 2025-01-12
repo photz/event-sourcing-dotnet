@@ -1,7 +1,7 @@
-using EventSourcing.Common.SerializedEvent;
-using Npgsql;
 using EventSourcing.Common.Event;
+using EventSourcing.Common.SerializedEvent;
 using EventSourcing.Common.Util;
+using Npgsql;
 
 namespace EventSourcing.Common.EventStore;
 
@@ -21,7 +21,8 @@ public class PostgresTransactionalEventStore
         Deserializer deserializer,
         string eventStoreTable,
         ILogger<PostgresTransactionalEventStore> logger
-    ) {
+    )
+    {
         _connectionPool = connectionPool;
         _serializer = serializer;
         _deserializer = deserializer;
@@ -33,30 +34,42 @@ public class PostgresTransactionalEventStore
 
     public void BeginTransaction()
     {
-        if (_connection != null || _activeTransaction != null) {
+        if (_connection != null || _activeTransaction != null)
+        {
             throw new Exception("Connection or transaction already active!");
         }
 
-        try {
+        try
+        {
             _connection = _connectionPool.OpenConnection();
-            _activeTransaction = _connection.BeginTransaction(System.Data.IsolationLevel.Serializable);
-        } catch (Exception ex) {
-            const int max = 500;  
-            throw new Exception("Failed to start transaction with " + 
-                (ex.Message?.Length > max ? ex.Message.Substring(0, max) : ex.Message), ex);
+            _activeTransaction = _connection.BeginTransaction(
+                System.Data.IsolationLevel.Serializable
+            );
+        }
+        catch (Exception ex)
+        {
+            const int max = 500;
+            throw new Exception(
+                "Failed to start transaction with "
+                    + (ex.Message?.Length > max ? ex.Message.Substring(0, max) : ex.Message),
+                ex
+            );
         }
     }
 
-    public AggregateAndEventIdsInLastEvent<T> FindAggregate<T>(string aggregateId) where T : Aggregate.Aggregate
+    public AggregateAndEventIdsInLastEvent<T> FindAggregate<T>(string aggregateId)
+        where T : Aggregate.Aggregate
     {
-        if (_activeTransaction == null) {
+        if (_activeTransaction == null)
+        {
             throw new Exception("Transaction must be active to perform operations!");
         }
-        
+
         var serializedEvents = FindAllSerializedEventsByAggregateId(aggregateId);
         var events = serializedEvents.Select(e => _deserializer.Deserialize(e)).ToList();
 
-        if (!events.Any()) {
+        if (!events.Any())
+        {
             throw new Exception($"No events found for aggregateId: {aggregateId}");
         }
 
@@ -64,85 +77,109 @@ public class PostgresTransactionalEventStore
         var transformationEvents = events.Skip(1).ToList();
 
         T aggregate;
-        if (creationEvent is CreationEvent<T> creation) {
+        if (creationEvent is CreationEvent<T> creation)
+        {
             aggregate = creation.CreateAggregate();
-        } else {
+        }
+        else
+        {
             throw new Exception("First event is not a creation event");
         }
 
         string eventIdOfLastEvent = creationEvent.EventId;
         string correlationIdOfLastEvent = creationEvent.CorrelationId;
 
-        foreach (var transformationEvent in transformationEvents) {
-            if (transformationEvent is TransformationEvent<T> transformation) {
+        foreach (var transformationEvent in transformationEvents)
+        {
+            if (transformationEvent is TransformationEvent<T> transformation)
+            {
                 aggregate = transformation.TransformAggregate(aggregate);
                 eventIdOfLastEvent = transformationEvent.EventId;
                 correlationIdOfLastEvent = transformationEvent.CorrelationId;
-            } else {
+            }
+            else
+            {
                 throw new Exception("Event is not a transformation event");
             }
         }
 
-        return new AggregateAndEventIdsInLastEvent<T> {
+        return new AggregateAndEventIdsInLastEvent<T>
+        {
             Aggregate = aggregate,
             EventIdOfLastEvent = eventIdOfLastEvent,
-            CorrelationIdOfLastEvent = correlationIdOfLastEvent
+            CorrelationIdOfLastEvent = correlationIdOfLastEvent,
         };
     }
 
     public void SaveEvent(Event.Event @event)
     {
-        if (_activeTransaction == null) {
+        if (_activeTransaction == null)
+        {
             throw new Exception("Transaction must be active to perform operations!");
         }
-        
+
         SaveSerializedEvent(_serializer.Serialize(@event));
     }
 
     public bool DoesEventAlreadyExist(string eventId)
     {
-        if (_activeTransaction == null) {
+        if (_activeTransaction == null)
+        {
             throw new Exception("Transaction must be active to perform operations!");
         }
-        
+
         return FindSerializedEventByEventId(eventId) != null;
     }
 
     public void CommitTransaction()
     {
-        if (_activeTransaction == null) {
+        if (_activeTransaction == null)
+        {
             throw new Exception("Transaction must be active to commit!");
         }
-        try {
+        try
+        {
             _activeTransaction.Commit();
             _activeTransaction = null;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new Exception("Failed to commit transaction", ex);
         }
     }
 
     public void AbortDanglingTransactionsAndReturnConnectionToPool()
     {
-        if (_activeTransaction != null) {
-            try {
+        if (_activeTransaction != null)
+        {
+            try
+            {
                 _activeTransaction.Rollback();
                 _activeTransaction = null;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, "Failed to rollback PG transaction");
             }
         }
-        
-        if (_connection != null) {
-            try {
+
+        if (_connection != null)
+        {
+            try
+            {
                 _connection.Close();
                 _connection = null;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, "Failed to release PG connection");
             }
         }
     }
 
-    private List<SerializedEvent.SerializedEvent> FindAllSerializedEventsByAggregateId(string aggregateId)
+    private List<SerializedEvent.SerializedEvent> FindAllSerializedEventsByAggregateId(
+        string aggregateId
+    )
     {
         var events = new List<SerializedEvent.SerializedEvent>();
         var sql = $"""
@@ -158,13 +195,17 @@ public class PostgresTransactionalEventStore
         command.Parameters.AddWithValue("@aggregateId", aggregateId);
         command.Transaction = _activeTransaction;
 
-        try {
+        try
+        {
             using var reader = command.ExecuteReader();
-            while (reader.Read()) {
+            while (reader.Read())
+            {
                 events.Add(MapResultSetToSerializedEvent(reader));
             }
             return events;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new Exception($"Failed to fetch events for aggregate: {aggregateId}", ex);
         }
     }
@@ -192,9 +233,12 @@ public class PostgresTransactionalEventStore
         command.Parameters.AddWithValue("@eventName", serializedEvent.EventName);
         command.Transaction = _activeTransaction;
 
-        try {
+        try
+        {
             command.ExecuteNonQuery();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new Exception($"Failed to save event: {serializedEvent.EventId}", ex);
         }
     }
@@ -213,12 +257,13 @@ public class PostgresTransactionalEventStore
         command.Parameters.AddWithValue("@eventId", eventId);
         command.Transaction = _activeTransaction;
 
-        try {
+        try
+        {
             using var reader = command.ExecuteReader();
-            return reader.Read() ? 
-                MapResultSetToSerializedEvent(reader) : 
-                null;
-        } catch (Exception ex) {
+            return reader.Read() ? MapResultSetToSerializedEvent(reader) : null;
+        }
+        catch (Exception ex)
+        {
             throw new Exception($"Failed to fetch event: {eventId}", ex);
         }
     }
@@ -226,17 +271,17 @@ public class PostgresTransactionalEventStore
     private SerializedEvent.SerializedEvent MapResultSetToSerializedEvent(NpgsqlDataReader reader)
     {
         return new SerializedEvent.SerializedEvent()
-            {
-                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                EventId = reader.GetString(reader.GetOrdinal("event_id")),
-                AggregateId = reader.GetString(reader.GetOrdinal("aggregate_id")),
-                CausationId = reader.GetString(reader.GetOrdinal("causation_id")),
-                CorrelationId = reader.GetString(reader.GetOrdinal("correlation_id")),
-                AggregateVersion = reader.GetInt32(reader.GetOrdinal("aggregate_version")),
-                JsonPayload = reader.GetString(reader.GetOrdinal("json_payload")),
-                JsonMetadata = reader.GetString(reader.GetOrdinal("json_metadata")),
-                RecordedOn = reader.GetString(reader.GetOrdinal("recorded_on")),
-                EventName = reader.GetString(reader.GetOrdinal("event_name"))
-            };
+        {
+            Id = reader.GetInt32(reader.GetOrdinal("id")),
+            EventId = reader.GetString(reader.GetOrdinal("event_id")),
+            AggregateId = reader.GetString(reader.GetOrdinal("aggregate_id")),
+            CausationId = reader.GetString(reader.GetOrdinal("causation_id")),
+            CorrelationId = reader.GetString(reader.GetOrdinal("correlation_id")),
+            AggregateVersion = reader.GetInt32(reader.GetOrdinal("aggregate_version")),
+            JsonPayload = reader.GetString(reader.GetOrdinal("json_payload")),
+            JsonMetadata = reader.GetString(reader.GetOrdinal("json_metadata")),
+            RecordedOn = reader.GetString(reader.GetOrdinal("recorded_on")),
+            EventName = reader.GetString(reader.GetOrdinal("event_name")),
+        };
     }
 }

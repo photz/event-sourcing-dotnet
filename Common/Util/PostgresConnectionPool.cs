@@ -14,7 +14,7 @@ public class PostgresConnectionPool
             MinPoolSize = 5,
             ConnectionIdleLifetime = 300,
             Timeout = 20,
-            Enlist = false
+            Enlist = false,
         };
 
         _dataSource = new NpgsqlDataSourceBuilder(builder.ToString()).Build();

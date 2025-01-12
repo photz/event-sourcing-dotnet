@@ -15,7 +15,8 @@ public class MembersByCuisineQueryController : QueryController
     public MembersByCuisineQueryController(
         MongoTransactionalProjectionOperator mongoTransactionalProjectionOperator,
         ILogger<MembersByCuisineQueryController> logger,
-        MembersByCuisineQueryHandler membersByCuisineQueryHandler)
+        MembersByCuisineQueryHandler membersByCuisineQueryHandler
+    )
         : base(mongoTransactionalProjectionOperator, logger)
     {
         _membersByCuisineQueryHandler = membersByCuisineQueryHandler;

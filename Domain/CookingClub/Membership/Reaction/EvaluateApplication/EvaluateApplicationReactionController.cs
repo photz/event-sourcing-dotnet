@@ -1,8 +1,8 @@
 using EventSourcing.Common.Ambar;
-using EventSourcing.Common.Reaction;
-using EventSourcing.Common.SerializedEvent;
 using EventSourcing.Common.EventStore;
 using EventSourcing.Common.Projection;
+using EventSourcing.Common.Reaction;
+using EventSourcing.Common.SerializedEvent;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventSourcing.Domain.CookingClub.Membership.Reaction.EvaluateApplication;
@@ -21,7 +21,8 @@ public class EvaluateApplicationReactionController : ReactionController
         MongoTransactionalProjectionOperator mongoOperator,
         Deserializer deserializer,
         ILogger<EvaluateApplicationReactionController> logger,
-        EvaluateApplicationReactionHandler evaluateApplicationReactionHandler)
+        EvaluateApplicationReactionHandler evaluateApplicationReactionHandler
+    )
         : base(eventStore, mongoOperator, deserializer, logger)
     {
         _evaluateApplicationReactionHandler = evaluateApplicationReactionHandler;
@@ -32,12 +33,9 @@ public class EvaluateApplicationReactionController : ReactionController
     {
         return new ContentResult
         {
-            Content = ProcessReactionHttpRequest(
-                request,
-                _evaluateApplicationReactionHandler
-            ),
+            Content = ProcessReactionHttpRequest(request, _evaluateApplicationReactionHandler),
             ContentType = "application/json",
-            StatusCode = 200
+            StatusCode = 200,
         };
     }
 }
