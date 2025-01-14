@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using EventSourcing.Domain.CookingClub.Membership.Event;
 using EventSourcing.Domain.Geolab.Organization.Event;
+using EventSourcing.Domain.Geolab.Project.Event;
 
 namespace EventSourcing.Common.SerializedEvent;
 
@@ -29,6 +30,7 @@ public class Serializer
             ApplicationSubmitted => "CookingClub_Membership_ApplicationSubmitted",
             ApplicationEvaluated => "CookingClub_Membership_ApplicationEvaluated",
             OrganizationAdded => "Geolab_Organization_OrganizationAdded",
+            ProjectStarted => "Geolab_Project_ProjectStarted",
             _ => throw new ArgumentException(
                 $"Unknown event type in Serializer: {@event.GetType().Name}"
             ),
@@ -60,6 +62,10 @@ public class Serializer
                     "evaluationOutcome",
                     applicationEvaluated.EvaluationOutcome.ToString()
                 );
+                break;
+
+            case ProjectStarted projectStarted:
+                jsonObject.Add("name", projectStarted.Name);
                 break;
 
             case OrganizationAdded organizationAdded:

@@ -3,6 +3,8 @@ using System.Text.Json.Nodes;
 using EventSourcing.Domain.CookingClub.Membership.Aggregate;
 using EventSourcing.Domain.CookingClub.Membership.Event;
 using EventSourcing.Domain.Geolab.Organization.Event;
+using EventSourcing.Domain.Geolab.Project.Aggregate;
+using EventSourcing.Domain.Geolab.Project.Event;
 
 namespace EventSourcing.Common.SerializedEvent;
 
@@ -47,6 +49,16 @@ public class Deserializer
                 ),
             },
             "Geolab_Organization_OrganizationAdded" => new OrganizationAdded
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+                Name = PayloadString(serializedEvent.JsonPayload, "name"),
+            },
+            "Geolab_Project_ProjectStarted" => new ProjectStarted
             {
                 EventId = serializedEvent.EventId,
                 AggregateId = serializedEvent.AggregateId,
