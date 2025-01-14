@@ -41,6 +41,14 @@ services:
     networks:
       event-sourcing:
         ipv4_address: 172.96.0.11
+    develop:
+      watch:
+      - path: ../Common
+        target: /src/
+        action: rebuild
+      - path: ../Domain
+        target: /src/
+        action: rebuild
 
   event-sourcing-event-store:
     image: postgres:16.4
