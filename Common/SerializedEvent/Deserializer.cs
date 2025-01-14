@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using EventSourcing.Domain.CookingClub.Membership.Aggregate;
 using EventSourcing.Domain.CookingClub.Membership.Event;
+using EventSourcing.Domain.Geolab.Identity.Event;
 using EventSourcing.Domain.Geolab.Organization.Event;
 using EventSourcing.Domain.Geolab.Project.Aggregate;
 using EventSourcing.Domain.Geolab.Project.Event;
@@ -67,6 +68,18 @@ public class Deserializer
                 CausationId = serializedEvent.CausationId,
                 RecordedOn = recordedOn,
                 Name = PayloadString(serializedEvent.JsonPayload, "name"),
+            },
+            "Geolab_Identity_SignedUp" => new SignedUp
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+                PrimaryEmail = PayloadString(serializedEvent.JsonPayload, "primaryEmail"),
+                HashedPassword = PayloadString(serializedEvent.JsonPayload, "hashedPassword"),
+                Username = PayloadString(serializedEvent.JsonPayload, "username"),
             },
             _ => throw new ArgumentException(
                 $"Unknown event type in Deserializer: {serializedEvent.EventName}"
