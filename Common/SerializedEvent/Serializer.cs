@@ -33,6 +33,7 @@ public class Serializer
             ApplicationEvaluated => "CookingClub_Membership_ApplicationEvaluated",
             OrganizationAdded => "OrganizationManagement_Organization_OrganizationAdded",
             ProjectStarted => "ProjectManagement_Project_ProjectStarted",
+            ProjectArchived => "ProjectManagement_Project_ProjectArchived",
             SignedUp => "Identity_User_SignedUp",
             _ => throw new ArgumentException(
                 $"Unknown event type in Serializer: {@event.GetType().Name}"
@@ -69,6 +70,9 @@ public class Serializer
 
             case ProjectStarted projectStarted:
                 jsonObject.Add("name", projectStarted.Name);
+                break;
+
+            case ProjectArchived projectArchived:
                 break;
 
             case SignedUp signedUp:

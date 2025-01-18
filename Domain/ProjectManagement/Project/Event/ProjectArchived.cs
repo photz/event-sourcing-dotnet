@@ -3,18 +3,16 @@ using EventSourcing.Domain.ProjectManagement.Project.Aggregate;
 
 namespace EventSourcing.Domain.ProjectManagement.Project.Event;
 
-public class ProjectStarted : CreationEvent<Aggregate.Project>
+public class ProjectArchived : TransformationEvent<Aggregate.Project>
 {
-    public required string Name { get; init; }
-
-    public override Aggregate.Project CreateAggregate()
+    public override Aggregate.Project TransformAggregate(Aggregate.Project aggregate)
     {
         return new Aggregate.Project()
         {
             AggregateId = AggregateId,
             AggregateVersion = AggregateVersion,
-            Name = Name,
-            Status = ProjectStatus.Started,
+            Name = aggregate.Name,
+            Status = ProjectStatus.Archived,
         };
     }
 }

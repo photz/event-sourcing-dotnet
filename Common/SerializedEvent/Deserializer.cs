@@ -70,6 +70,15 @@ public class Deserializer
                 RecordedOn = recordedOn,
                 Name = PayloadString(serializedEvent.JsonPayload, "name"),
             },
+            "ProjectManagement_Project_ProjectArchived" => new ProjectArchived
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+            },
             "Identity_User_SignedUp" => new SignedUp
             {
                 EventId = serializedEvent.EventId,
