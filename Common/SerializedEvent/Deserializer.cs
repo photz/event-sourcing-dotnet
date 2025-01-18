@@ -2,10 +2,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using EventSourcing.Domain.CookingClub.Membership.Aggregate;
 using EventSourcing.Domain.CookingClub.Membership.Event;
-using EventSourcing.Domain.Geolab.Identity.Event;
-using EventSourcing.Domain.Geolab.Organization.Event;
-using EventSourcing.Domain.Geolab.Project.Aggregate;
-using EventSourcing.Domain.Geolab.Project.Event;
+using EventSourcing.Domain.Identity.User.Event;
+using EventSourcing.Domain.OrganizationManagement.Organization.Event;
+using EventSourcing.Domain.ProjectManagement.Project.Aggregate;
+using EventSourcing.Domain.ProjectManagement.Project.Event;
 
 namespace EventSourcing.Common.SerializedEvent;
 
@@ -49,7 +49,7 @@ public class Deserializer
                     PayloadString(serializedEvent.JsonPayload, "evaluationOutcome")
                 ),
             },
-            "Geolab_Organization_OrganizationAdded" => new OrganizationAdded
+            "OrganizationManagement_Organization_OrganizationAdded" => new OrganizationAdded
             {
                 EventId = serializedEvent.EventId,
                 AggregateId = serializedEvent.AggregateId,
@@ -59,7 +59,7 @@ public class Deserializer
                 RecordedOn = recordedOn,
                 Name = PayloadString(serializedEvent.JsonPayload, "name"),
             },
-            "Geolab_Project_ProjectStarted" => new ProjectStarted
+            "ProjectManagement_Project_ProjectStarted" => new ProjectStarted
             {
                 EventId = serializedEvent.EventId,
                 AggregateId = serializedEvent.AggregateId,
@@ -69,7 +69,7 @@ public class Deserializer
                 RecordedOn = recordedOn,
                 Name = PayloadString(serializedEvent.JsonPayload, "name"),
             },
-            "Geolab_Identity_SignedUp" => new SignedUp
+            "Identity_User_SignedUp" => new SignedUp
             {
                 EventId = serializedEvent.EventId,
                 AggregateId = serializedEvent.AggregateId,

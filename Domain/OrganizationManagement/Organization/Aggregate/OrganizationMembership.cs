@@ -1,0 +1,1 @@
+namespace EventSourcing.Domain.OrganizationManagement.OrganizationMembership.Aggregate;
