@@ -4,6 +4,7 @@ using EventSourcing.Domain.CookingClub.Membership.Aggregate;
 using EventSourcing.Domain.CookingClub.Membership.Event;
 using EventSourcing.Domain.Identity.User.Event;
 using EventSourcing.Domain.OrganizationManagement.Organization.Event;
+using EventSourcing.Domain.OrganizationManagement.OrgMembership.Event;
 using EventSourcing.Domain.ProjectManagement.Project.Aggregate;
 using EventSourcing.Domain.ProjectManagement.Project.Event;
 using EventSourcing.Domain.SampleManagement.Sample.Event;
@@ -59,6 +60,17 @@ public class Deserializer
                 CausationId = serializedEvent.CausationId,
                 RecordedOn = recordedOn,
                 Name = PayloadString(serializedEvent.JsonPayload, "name"),
+            },
+            "OrganizationManagement_OrgMembership_MemberAdded" => new MemberAdded
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+                UserId = PayloadString(serializedEvent.JsonPayload, "userId"),
+                OrgId = PayloadString(serializedEvent.JsonPayload, "orgId"),
             },
             "ProjectManagement_Project_ProjectStarted" => new ProjectStarted
             {

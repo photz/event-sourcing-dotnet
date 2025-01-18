@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using EventSourcing.Domain.CookingClub.Membership.Event;
 using EventSourcing.Domain.Identity.User.Event;
 using EventSourcing.Domain.OrganizationManagement.Organization.Event;
+using EventSourcing.Domain.OrganizationManagement.OrgMembership.Event;
 using EventSourcing.Domain.ProjectManagement.Project.Event;
 using EventSourcing.Domain.SampleManagement.Sample.Event;
 
@@ -35,6 +36,7 @@ public class Serializer
             ProjectStarted => "ProjectManagement_Project_ProjectStarted",
             ProjectArchived => "ProjectManagement_Project_ProjectArchived",
             SignedUp => "Identity_User_SignedUp",
+            MemberAdded => "OrganizationManagement_OrgMembership_MemberAdded",
             _ => throw new ArgumentException(
                 $"Unknown event type in Serializer: {@event.GetType().Name}"
             ),
@@ -88,6 +90,11 @@ public class Serializer
 
             case OrganizationAdded organizationAdded:
                 jsonObject.Add("name", organizationAdded.Name);
+                break;
+
+            case MemberAdded memberAdded:
+                jsonObject.Add("userId", memberAdded.UserId);
+                jsonObject.Add("orgId", memberAdded.OrgId);
                 break;
 
             case Collected collected:
