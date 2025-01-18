@@ -3,6 +3,7 @@ using EventSourcing.Domain.CookingClub.Membership.Event;
 using EventSourcing.Domain.Identity.User.Event;
 using EventSourcing.Domain.OrganizationManagement.Organization.Event;
 using EventSourcing.Domain.ProjectManagement.Project.Event;
+using EventSourcing.Domain.SampleManagement.Sample.Event;
 
 namespace EventSourcing.Common.SerializedEvent;
 
@@ -78,6 +79,10 @@ public class Serializer
 
             case OrganizationAdded organizationAdded:
                 jsonObject.Add("name", organizationAdded.Name);
+                break;
+
+            case Collected collected:
+                jsonObject.Add("tag", collected.Tag);
                 break;
         }
 

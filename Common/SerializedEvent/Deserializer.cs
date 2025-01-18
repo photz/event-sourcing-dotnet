@@ -6,6 +6,7 @@ using EventSourcing.Domain.Identity.User.Event;
 using EventSourcing.Domain.OrganizationManagement.Organization.Event;
 using EventSourcing.Domain.ProjectManagement.Project.Aggregate;
 using EventSourcing.Domain.ProjectManagement.Project.Event;
+using EventSourcing.Domain.SampleManagement.Sample.Event;
 
 namespace EventSourcing.Common.SerializedEvent;
 
@@ -80,6 +81,16 @@ public class Deserializer
                 PrimaryEmail = PayloadString(serializedEvent.JsonPayload, "primaryEmail"),
                 HashedPassword = PayloadString(serializedEvent.JsonPayload, "hashedPassword"),
                 Username = PayloadString(serializedEvent.JsonPayload, "username"),
+            },
+            "SampleManagement_Sample_Collected" => new Collected
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+                Tag = PayloadString(serializedEvent.JsonPayload, "tag"),
             },
             _ => throw new ArgumentException(
                 $"Unknown event type in Deserializer: {serializedEvent.EventName}"
