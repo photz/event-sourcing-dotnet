@@ -82,6 +82,17 @@ public class Deserializer
                 HashedPassword = PayloadString(serializedEvent.JsonPayload, "hashedPassword"),
                 Username = PayloadString(serializedEvent.JsonPayload, "username"),
             },
+            "Identity_User_Invited" => new Invited
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+                PrimaryEmail = PayloadString(serializedEvent.JsonPayload, "primaryEmail"),
+                Username = PayloadString(serializedEvent.JsonPayload, "username"),
+            },
             "SampleManagement_Sample_Collected" => new Collected
             {
                 EventId = serializedEvent.EventId,

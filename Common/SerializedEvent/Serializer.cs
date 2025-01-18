@@ -77,6 +77,11 @@ public class Serializer
                 jsonObject.Add("primaryEmail", signedUp.PrimaryEmail);
                 break;
 
+            case Invited invited:
+                jsonObject.Add("username", invited.Username);
+                jsonObject.Add("primaryEmail", invited.PrimaryEmail);
+                break;
+
             case OrganizationAdded organizationAdded:
                 jsonObject.Add("name", organizationAdded.Name);
                 break;
