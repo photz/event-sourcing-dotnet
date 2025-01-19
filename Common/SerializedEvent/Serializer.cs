@@ -33,6 +33,7 @@ public class Serializer
             ApplicationSubmitted => "CookingClub_Membership_ApplicationSubmitted",
             ApplicationEvaluated => "CookingClub_Membership_ApplicationEvaluated",
             OrganizationAdded => "OrganizationManagement_Organization_OrganizationAdded",
+            OrganizationRenamed => "OrganizationManagement_Organization_OrganizationRenamed",
             ProjectStarted => "ProjectManagement_Project_ProjectStarted",
             ProjectArchived => "ProjectManagement_Project_ProjectArchived",
             SignedUp => "Identity_User_SignedUp",
@@ -90,15 +91,21 @@ public class Serializer
 
             case OrganizationAdded organizationAdded:
                 jsonObject.Add("name", organizationAdded.Name);
+                jsonObject.Add("creatorId", organizationAdded.CreatorId);
                 break;
 
             case MemberAdded memberAdded:
                 jsonObject.Add("userId", memberAdded.UserId);
                 jsonObject.Add("orgId", memberAdded.OrgId);
+                jsonObject.Add("inviterId", memberAdded.InviterId);
                 break;
 
             case Collected collected:
                 jsonObject.Add("tag", collected.Tag);
+                break;
+
+            case OrganizationRenamed organizationRenamed:
+                jsonObject.Add("name", organizationRenamed.Name);
                 break;
         }
 

@@ -1,3 +1,4 @@
+using System.Text;
 using EventSourcing.Common.Command;
 using EventSourcing.Common.EventStore;
 using EventSourcing.Common.Projection;
@@ -7,6 +8,14 @@ using EventSourcing.Common.SerializedEvent;
 using EventSourcing.Common.Util;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens; // For token validation parameters
+using Microsoft.AspNetCore.Authorization;
+
+using Microsoft.IdentityModel.Logging;
+
+// Enable PII logging
+IdentityModelEventSource.ShowPII = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +50,54 @@ builder.Services.AddSingleton<PostgresInitializer>(provider => {
         GetEnvVar("EVENT_STORE_CREATE_REPLICATION_PUBLICATION"),
         logger
     );
+});
+
+builder.Services.AddAuthentication() //JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+    {
+        options.Authority = "https://your-identity-provider"; // e.g., Auth0, Azure AD, etc.
+        options.Audience = "your-audience"; // API audience expected in JWT
+	options.IncludeErrorDetails = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false,
+            ValidateIssuerSigningKey = false,
+	    ValidIssuer = "unit-test",
+	    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("oobeish5hepacahdiD0il5on1laipafez1aiCeerie8waev4eequ5oM4eem7aeNioxuvaixoo5eraiquiech9eelij8gahngic7a")) { KeyId = "test" }
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                // Accept all tokens without further validation
+                Console.WriteLine("Custom token validation logic executed.");
+                return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            }
+        };
+
+
+Console.WriteLine($"ValidateIssuer: {options.TokenValidationParameters.ValidateIssuer}");
+Console.WriteLine($"ValidateAudience: {options.TokenValidationParameters.ValidateAudience}");
+Console.WriteLine($"ValidateIssuerSigningKey: {options.TokenValidationParameters.ValidateIssuerSigningKey}");
+Console.WriteLine($"ValidateLifetime: {options.TokenValidationParameters.ValidateLifetime}");
+
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+
+        options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+	    .RequireClaim("userId")
+	    //.RequireAuthenticatedUser()
+                                .Build();
 });
 
 var mongoConnectionString = 
@@ -128,6 +185,8 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
+app.UseAuthentication();
+app.UseAuthorization();
 // Run app
 app.MapControllers();
 app.Run();

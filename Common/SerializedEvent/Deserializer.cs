@@ -60,6 +60,17 @@ public class Deserializer
                 CausationId = serializedEvent.CausationId,
                 RecordedOn = recordedOn,
                 Name = PayloadString(serializedEvent.JsonPayload, "name"),
+                CreatorId = PayloadString(serializedEvent.JsonPayload, "creatorId"),
+            },
+            "OrganizationManagement_Organization_OrganizationRenamed" => new OrganizationRenamed
+            {
+                EventId = serializedEvent.EventId,
+                AggregateId = serializedEvent.AggregateId,
+                AggregateVersion = serializedEvent.AggregateVersion,
+                CorrelationId = serializedEvent.CorrelationId,
+                CausationId = serializedEvent.CausationId,
+                RecordedOn = recordedOn,
+                Name = PayloadString(serializedEvent.JsonPayload, "name"),
             },
             "OrganizationManagement_OrgMembership_MemberAdded" => new MemberAdded
             {
