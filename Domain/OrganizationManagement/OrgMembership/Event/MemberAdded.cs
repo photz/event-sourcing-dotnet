@@ -7,6 +7,7 @@ public class MemberAdded : CreationEvent<Aggregate.OrgMembership>
 {
     public required string UserId { get; init; }
     public required string OrgId { get; init; }
+    public required string InviterId { get; init; }
 
     public override Aggregate.OrgMembership CreateAggregate()
     {

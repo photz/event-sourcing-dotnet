@@ -4,4 +4,5 @@ public class AddMemberCommand : Common.Command.Command
 {
     public required string UserId { get; init; }
     public required string OrgId { get; init; }
+    public required string InviterId { get; init; }
 }

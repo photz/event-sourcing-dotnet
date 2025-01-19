@@ -82,6 +82,7 @@ public class Deserializer
                 RecordedOn = recordedOn,
                 UserId = PayloadString(serializedEvent.JsonPayload, "userId"),
                 OrgId = PayloadString(serializedEvent.JsonPayload, "orgId"),
+                InviterId = PayloadString(serializedEvent.JsonPayload, "inviterId"),
             },
             "ProjectManagement_Project_ProjectStarted" => new ProjectStarted
             {

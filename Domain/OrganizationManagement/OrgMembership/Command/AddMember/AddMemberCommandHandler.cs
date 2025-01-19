@@ -25,7 +25,8 @@ public class AddMemberCommandHandler : CommandHandler
     private void HandleAddMember(AddMemberCommand command)
     {
         var eventId = IdGenerator.GenerateRandomId();
-        var aggregateId = IdGenerator.GenerateRandomId();
+
+        var aggregateId = command.UserId + ":" + command.OrgId;
 
         _postgresTransactionalEventStore.SaveEvent(
             new MemberAdded()
@@ -38,6 +39,7 @@ public class AddMemberCommandHandler : CommandHandler
                 RecordedOn = DateTime.UtcNow,
                 UserId = command.UserId,
                 OrgId = command.OrgId,
+                InviterId = command.InviterId,
             }
         );
     }
